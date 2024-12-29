@@ -103,15 +103,12 @@ def calculate_total_consumption(session: Session, start_dt, end_dt) -> float:
 
 def calculate_base_load(session: Session) -> float:
     """
-    Exemple de calcul du 'talon' (ici le 5ᵉ centile des consommations).
+    Exemple de calcul du talon sur l'ensemble de la base.
     """
-    consumptions = session.query(ConsumptionRecord.consumption_kwh).all()
-    consumptions_list = [c[0] for c in consumptions]
-
-    if not consumptions_list:
+    records = session.query(ConsumptionRecord.consumption_kwh).all()
+    consumptions = [r[0] for r in records]
+    if not consumptions:
         return 0.0
-
-    consumptions_list.sort()
-    index_5pct = int(len(consumptions_list) * 0.05)
-    base_load = consumptions_list[index_5pct]
-    return base_load
+    consumptions.sort()
+    index_5pct = int(len(consumptions) * 0.05)
+    return consumptions[index_5pct]
