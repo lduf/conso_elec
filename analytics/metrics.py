@@ -5,9 +5,10 @@ def compute_cost_hp_hc(df, hp_cost, hc_cost, hp_start, hp_end):
     Calcule le coût total selon que chaque enregistrement tombe en HP ou HC.
     df doit avoir un index 'start_time' (datetime) et une col 'consumption_kwh'.
     """
-    total_cost = 0.0
+    total_cost_hp = 0.0
+    total_cost_hc = 0.0
     if df.empty:
-        return total_cost
+        return total_cost_hc, total_cost_hp, 0.0
 
     for ts, row in df.iterrows():
         time_of_day = ts.time()
@@ -17,9 +18,17 @@ def compute_cost_hp_hc(df, hp_cost, hc_cost, hp_start, hp_end):
             in_hp = (time_of_day >= hp_start) or (time_of_day < hp_end)
 
         cost = row['consumption_kwh'] * (hp_cost if in_hp else hc_cost)
-        total_cost += cost
+        if in_hp:
+            total_cost_hp += cost
+        else:
+            total_cost_hc += cost
 
-    return total_cost
+    total_cost = total_cost_hp + total_cost_hc
+    return {
+        "total_hc": total_cost_hc,
+        "total_hp": total_cost_hp,
+        "total": total_cost
+    }
 
 
 def compute_talon_on_df(df):
@@ -52,5 +61,7 @@ def compute_all_metrics(df, hp_cost, hc_cost, hp_start, hp_end):
     return {
         "talon": talon_val,
         "total_conso": total_conso_val,
-        "cost": total_cost_val
+        "cost": total_cost_val["total"],
+        "cost_hp": total_cost_val["total_hp"],
+        "cost_hc": total_cost_val["total_hc"]
     }

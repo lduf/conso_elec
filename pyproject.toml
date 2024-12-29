@@ -13,3 +13,8 @@ dependencies = [
     "sqlalchemy>=2.0.36",
     "streamlit>=1.41.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.11.1",
+]

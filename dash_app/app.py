@@ -27,6 +27,7 @@ app.layout = dbc.Container(
                     dcc.DatePickerSingle(
                         id='start-date',
                         date=datetime.date(2024, 1, 1),
+                        display_format="DD/MM/YYYY",
                         className="mb-3"
                     ),
                     html.Br(),
@@ -34,6 +35,7 @@ app.layout = dbc.Container(
                     dcc.DatePickerSingle(
                         id='end-date',
                         date=datetime.date(2024, 1, 7),
+                        display_format="DD/MM/YYYY",
                         className="mb-3"
                     ),
                     html.Br(),
@@ -177,6 +179,14 @@ def update_graph_and_metrics(start_dt, end_dt, aggregation, relayout_data, curre
         dbc.Col(dbc.Card([
             dbc.CardHeader("Coût estimé"),
             dbc.CardBody(html.H4(f"{results['cost']:.2f} €", className="card-title"))
+        ]), width=3),
+        dbc.Col(dbc.Card([
+            dbc.CardHeader("Coût HP estimé"),
+            dbc.CardBody(html.H4(f"{results['cost_hp']:.2f} €", className="card-title"))
+        ]), width=3),
+        dbc.Col(dbc.Card([
+            dbc.CardHeader("Coût HC estimé"),
+            dbc.CardBody(html.H4(f"{results['cost_hc']:.2f} €", className="card-title"))
         ]), width=3),
         dbc.Col(dbc.Card([
             dbc.CardHeader("Consommation moyenne"),

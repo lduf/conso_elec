@@ -53,7 +53,7 @@ def import_data_with_duplicates_management(df, session: Session):
         start_str = row['Début']
         end_str = row['Fin']
         consumption_str = str(row['Valeur (en kW)']).replace(',', '.')
-        consumption = float(consumption_str)
+        consumption = float(consumption_str) / 2.0
 
         start_time = datetime.strptime(start_str, "%d/%m/%Y %H:%M:%S")
         end_time = datetime.strptime(end_str, "%d/%m/%Y %H:%M:%S")
