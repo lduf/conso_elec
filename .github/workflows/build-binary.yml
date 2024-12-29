@@ -1,14 +1,14 @@
-name: Build Binary for macOS
+name: Build and Release Binary
 
 on:
   push:
     tags:
-      - 'v*'  # Déclenche sur les tags commençant par "v"
+      - 'v*'  # Déclenche le workflow lors de la création d'un tag commençant par "v"
 
 jobs:
   build:
-    name: Build Binary
-    runs-on: macos-latest  # Spécifie l'environnement macOS
+    name: Build and Release Binary
+    runs-on: macos-latest
 
     steps:
       # Étape 1 : Récupérer le code source
@@ -21,7 +21,7 @@ jobs:
         with:
           version: "0.5.13"  # Optionnel : version spécifique
 
-      # Étape 3 : Configurer Python (respecte pyproject.toml)
+      # Étape 3 : Configurer Python
       - name: Set up Python
         run: uv python install
 
@@ -29,20 +29,31 @@ jobs:
       - name: Sync dependencies
         run: uv sync --all-extras --dev
 
-      # Étape 5 : Installer PyInstaller explicitement
-      - name: Ensure PyInstaller is installed
-        run: pip install pyinstaller
-
-      # Étape 6 : Construire le binaire
+      # Étape 5 : Construire le binaire
       - name: Build binary with PyInstaller
         run: |
+          pip install pyinstaller  # Vérifie que PyInstaller est installé
           pyinstaller --onefile main.py --name conso_elec
         env:
-          UV_SYSTEM_PYTHON: 1  # Utiliser Python système si nécessaire
+          UV_SYSTEM_PYTHON: 1
 
-      # Étape 7 : Publier les artefacts
-      - name: Upload binary
-        uses: actions/upload-artifact@v3
+      # Étape 6 : Créer une release
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          name: conso_elec-binary
-          path: dist/conso_elec
+          tag_name: ${{ github.ref_name }}  # Utilise le tag actuel
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Étape 7 : Ajouter le binaire à la release
+      - name: Upload Binary to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/conso_elec  # Chemin vers le binaire
+          asset_name: conso_elec # Nom sous lequel le fichier sera disponible
+          asset_content_type: application/octet-stream
