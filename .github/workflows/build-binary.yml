@@ -27,14 +27,18 @@ jobs:
       - name: Sync dependencies
         run: uv sync --all-extras --dev
 
-      # Étape 5 : Construire le binaire
+      # Étape 5 : Activer l'environnement virtuel
+      - name: Activate virtual environment
+        run: source .venv/bin/activate
+
+      # Étape 6 : Construire le binaire
       - name: Build binary with PyInstaller
         run: |
           pyinstaller --onefile main.py --name conso_elec
         env:
           UV_SYSTEM_PYTHON: 1  # Installer dans le système Python si nécessaire
 
-      # Étape 6 : Publier les artefacts
+      # Étape 7 : Publier les artefacts
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
