@@ -1,0 +1,42 @@
+name: Build Binary for macOS
+
+on:
+  push:
+    tags:
+      - 'v*'  # Déclenche sur les tags commençant par "v"
+
+jobs:
+  build:
+    name: Build Binary
+    runs-on: macos-latest  # Spécifie l'environnement macOS
+
+    steps:
+      # Étape 1 : Récupérer le code source
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Étape 2 : Installer uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # Étape 3 : Configurer Python (respecte pyproject.toml)
+      - name: Set up Python
+        run: uv python install
+
+      # Étape 4 : Synchroniser les dépendances
+      - name: Sync dependencies
+        run: uv sync --all-extras --dev
+
+      # Étape 5 : Construire le binaire
+      - name: Build binary with PyInstaller
+        run: |
+          pyinstaller --onefile main.py --name conso_elec
+        env:
+          UV_SYSTEM_PYTHON: 1  # Installer dans le système Python si nécessaire
+
+      # Étape 6 : Publier les artefacts
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: conso_elec-binary
+          path: dist/conso_elec
