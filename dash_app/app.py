@@ -28,10 +28,9 @@ def compute_solar_production(df: pd.DataFrame, settings) -> pd.Series:
     """Production solaire (kWh)."""
     if "shortwave_radiation" not in df.columns:
         return pd.Series(0, index=df.index)
-    area = settings.solar_area
+    wc = settings.solar_wc / 1000
     efficiency = settings.solar_efficiency / 100
-    loss = settings.solar_loss / 100
-    solar_production = (df["shortwave_radiation"] * area * efficiency * (1 - loss)) / 1000
+    solar_production = (df["shortwave_radiation"] * wc * efficiency ) / 1000
     return solar_production
 
 

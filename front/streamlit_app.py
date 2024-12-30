@@ -65,10 +65,9 @@ def main():
         longitude = st.number_input("Longitude", value=settings.longitude, format="%.6f")
 
         st.header("Photovoltaïque")
-        solar_area = st.number_input("Surface", value=settings.solar_area, format="%.2f")
-        solar_efficiency = st.number_input("Efficacité", value=settings.solar_efficiency, format="%.2f")
+        solar_wc = st.number_input("Watt crète (Wc)", value=settings.solar_wc, format="%.0f")
+        solar_efficiency = st.number_input("Efficacité", value=settings.solar_efficiency,format="%.2f")
         solar_cost = st.number_input("Coût", value=settings.solar_cost, format="%.2f")
-        solar_loss = st.number_input("Perte", value=settings.solar_loss, format="%.2f")
 
         if st.button("Sauvegarder paramètres"):
             settings.hp_cost = hp_cost
@@ -77,10 +76,9 @@ def main():
             settings.hp_end = hp_end
             settings.latitude = latitude
             settings.longitude = longitude
-            settings.solar_area = solar_area
+            settings.solar_wc = solar_wc
             settings.solar_efficiency = solar_efficiency
             settings.solar_cost = solar_cost
-            settings.solar_loss = solar_loss
             session.commit()
             st.success("Paramètres sauvegardés !")
 

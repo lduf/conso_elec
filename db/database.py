@@ -23,10 +23,9 @@ class Settings(Base):
     hp_end = Column(Time, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    solar_area = Column(Float, nullable=False)
+    solar_wc = Column(Float, nullable=False)
     solar_efficiency = Column(Float, nullable=False)
     solar_cost = Column(Float, nullable=False)
-    solar_loss = Column(Float, nullable=False)
 
 class Weather(Base):
     __tablename__ = 'weather'
@@ -64,16 +63,15 @@ def get_or_create_settings(session):
     if not settings:
         # Crée des paramètres par défaut
         settings = Settings(
-            hp_cost=0.20,
-            hc_cost=0.15,
+            hp_cost=0.27,
+            hc_cost=0.2068,
             hp_start=time(7, 15),
             hp_end=time(23, 30),
             latitude=48.68,
             longitude=3.2199998,
-            solar_area=0.0,
+            solar_wc=0,
             solar_efficiency=80.0,
             solar_cost=0.0,
-            solar_loss=15.0
         )
         session.add(settings)
         session.commit()

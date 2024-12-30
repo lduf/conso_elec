@@ -33,7 +33,7 @@ def fetch_weather_data(
     Returns:
         pd.DataFrame: Données météo sous forme de DataFrame.
     """
-    url = "https://api.open-meteo.com/v1/forecast"
+    url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": latitude,
         "longitude": longitude,
