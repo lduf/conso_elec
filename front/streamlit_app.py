@@ -1,11 +1,10 @@
-# streamlit_app.py
-
 import streamlit as st
 from extraction.excel_extractor import read_xlsx_and_return_df
 from analytics.calculations import (
     import_data_with_duplicates_management,
     calculate_base_load
 )
+from analytics.weather_to_consumption import integrate_weather_with_consumption
 from db.database import get_engine, create_tables, get_session, get_or_create_settings
 from db.database import ConsumptionRecord
 
@@ -61,11 +60,27 @@ def main():
         hp_start = st.time_input("Début HP", value=settings.hp_start)
         hp_end = st.time_input("Fin HP", value=settings.hp_end)
 
+        st.header("Localisation")
+        latitude = st.number_input("Latitude", value=settings.latitude, format="%.6f")
+        longitude = st.number_input("Longitude", value=settings.longitude, format="%.6f")
+
+        st.header("Photovoltaïque")
+        solar_area = st.number_input("Surface", value=settings.solar_area, format="%.2f")
+        solar_efficiency = st.number_input("Efficacité", value=settings.solar_efficiency, format="%.2f")
+        solar_cost = st.number_input("Coût", value=settings.solar_cost, format="%.2f")
+        solar_loss = st.number_input("Perte", value=settings.solar_loss, format="%.2f")
+
         if st.button("Sauvegarder paramètres"):
             settings.hp_cost = hp_cost
             settings.hc_cost = hc_cost
             settings.hp_start = hp_start
             settings.hp_end = hp_end
+            settings.latitude = latitude
+            settings.longitude = longitude
+            settings.solar_area = solar_area
+            settings.solar_efficiency = solar_efficiency
+            settings.solar_cost = solar_cost
+            settings.solar_loss = solar_loss
             session.commit()
             st.success("Paramètres sauvegardés !")
 
@@ -93,6 +108,12 @@ def main():
                 for file_name, conflict in total_conflicts:
                     st.write(f"**Fichier** : {file_name}")
                     handle_conflict_block(conflict, session)
+
+    st.markdown("---")
+    st.subheader("Récupération des données météos")
+    if st.button("Importer les données météo"):
+        integrate_weather_with_consumption(session, settings.latitude, settings.longitude)
+        st.success("Données météo importées et associées aux jours de consommation.")
 
     st.markdown("---")
     st.subheader("Calcul du talon (global)")

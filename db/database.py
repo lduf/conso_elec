@@ -1,6 +1,6 @@
-from datetime import datetime, time
+from datetime import time
 
-from sqlalchemy import create_engine, Column, Integer, Float, DateTime, Time
+from sqlalchemy import create_engine, Column, Integer, Float, DateTime, Time, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 Base = declarative_base()
@@ -21,6 +21,29 @@ class Settings(Base):
     hc_cost = Column(Float, nullable=False)
     hp_start = Column(Time, nullable=False)
     hp_end = Column(Time, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    solar_area = Column(Float, nullable=False)
+    solar_efficiency = Column(Float, nullable=False)
+    solar_cost = Column(Float, nullable=False)
+    solar_loss = Column(Float, nullable=False)
+
+class Weather(Base):
+    __tablename__ = 'weather'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    time = Column(DateTime, nullable=False, unique=True)
+    shortwave_radiation = Column(Float, nullable=True)
+    direct_radiation = Column(Float, nullable=True)
+    direct_normal_irradiance = Column(Float, nullable=True)
+    diffuse_radiation = Column(Float, nullable=True)
+    temperature_2m = Column(Float, nullable=True)
+    cloud_cover = Column(Float, nullable=True)
+    wind_speed_10m = Column(Float, nullable=True)
+    precipitation = Column(Float, nullable=True)
+
+    __table_args__ = (UniqueConstraint('time', name='unique_time_weather'),)
+
 
 def get_engine(db_path: str = "sqlite:///consumption.db"):
     engine = create_engine(db_path, echo=False)
@@ -43,8 +66,14 @@ def get_or_create_settings(session):
         settings = Settings(
             hp_cost=0.20,
             hc_cost=0.15,
-            hp_start=time(7, 0),
-            hp_end=time(23, 0)
+            hp_start=time(7, 15),
+            hp_end=time(23, 30),
+            latitude=48.68,
+            longitude=3.2199998,
+            solar_area=0.0,
+            solar_efficiency=80.0,
+            solar_cost=0.0,
+            solar_loss=15.0
         )
         session.add(settings)
         session.commit()
